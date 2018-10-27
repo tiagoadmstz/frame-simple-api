@@ -16,6 +16,7 @@ import java.awt.Image;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +52,7 @@ public abstract class ManipulaFrames extends JFrame {
 
     private static final long serialVersionUID = 5932987037949674860L;
     public static int NOVO = 0, CANCELAR = 1, SALVAR = 3, EDITAR = 4, FECHAR = 1, IMPRIMIR = 5, DELETAR = 1, ALTERAR = 2;
-    private final Image image = new ImageIcon(getClass().getResource("/br/com/fs/api/img/icone.gif")).getImage();
+    private final Image image = new ImageIcon(getClass().getResource("/br/com/sres/img/iconeSermed.gif")).getImage();
     private int operacaoAtual = -1;
 
     public Optional<List<JPanel>> getListPaineis() {
@@ -295,7 +296,15 @@ public abstract class ManipulaFrames extends JFrame {
         }
     }
 
-    public synchronized void limparCampos(int codigoOperacao, Component[] componentes) {
+    public synchronized void limparCampos() {
+        try {
+            getListPaineis().get().forEach(pl -> limparCampos(NOVO, pl.getComponents()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private synchronized void limparCampos(int codigoOperacao, Component[] componentes) {
         if (codigoOperacao != EDITAR && codigoOperacao != SALVAR && codigoOperacao != ALTERAR) {
             for (Component component : componentes) {
                 if (component instanceof JFormattedTextField) {
@@ -385,14 +394,58 @@ public abstract class ManipulaFrames extends JFrame {
                         && (mf.getAnnotation(MapFrameField.class).targetEntity() == object.getClass()
                         || mf.getAnnotation(MapFrameField.class).targetEntity() == Object.class)) {
                     MapFrameField map = mf.getAnnotation(MapFrameField.class);
-                    Method mo = getObjectGetSetMethod(object, map, "set");
+                    chamadaSetEncadeada(map, object, mf);
+                    //Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "set");
                     //System.out.println(mo.getName());
-                    try {
-                        mo.invoke(object, getFrameObjectGetSetMethod(mf, map, getStrMethod(mf.getReturnType(), map, "get"), null));
-                    } catch (Exception e) {
-                    }
+                    //try {
+                    //   mo.invoke(object, getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null));
+                    //} catch (Exception e) {
+                    //}
                     //System.out.println("PASSOU");
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void chamadaSetEncadeada(MapFrameField map, ManipulaBean object, Method mf) {
+        try {
+            if (map.referencedField().contains(".")) {
+                String[] campos = map.referencedField().split("\\.");
+                Object ob = null;
+                Method m = null;
+                for (int c = 0; c < campos.length; c++) {
+                    //if (c != campos.length - 1) {
+                    if (c == 0) {
+                        m = getObjectGetSetMethod(object, campos[c], map.typeParameter(), "get");
+                        if (m.invoke(object) == null) {
+                            ob = m.getReturnType().getConstructor().newInstance();
+                            Method ms = getObjectGetSetMethod(object, campos[c], m.getReturnType(), "set");
+                            ms.invoke(object, ob);
+                        } else {
+                            ob = m.invoke(object);
+                        }
+                    } else {
+                        if (c != campos.length - 1) {
+                            m = getObjectGetSetMethod((ManipulaBean) ob, campos[c], map.typeParameter(), "get");
+                        } else {
+                            m = getObjectGetSetMethod((ManipulaBean) ob, campos[c], map.typeParameter(), "set");
+                        }
+                    }
+                }
+                try {
+                    m.invoke(ob, getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null, null));
+                } catch (Exception e) {
+                }
+            } else {
+                Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "set");
+                //System.out.println(mo.getName());
+                try {
+                    mo.invoke(object, getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null, null));
+                } catch (Exception e) {
+                }
+                //System.out.println("PASSOU");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -415,10 +468,11 @@ public abstract class ManipulaFrames extends JFrame {
                                     && (mf.getAnnotation(MapFrameField.class).targetEntity() == object.getClass()
                                     || mf.getAnnotation(MapFrameField.class).targetEntity() == Object.class)) {
                                 MapFrameField map = mf.getAnnotation(MapFrameField.class);
-                                Method mo = getObjectGetSetMethod(object, map, "get");
+                                chamadaGetEncadeada(map, object, mf);
+                                //Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "get");
                                 //System.out.println(mo.getName() + " = " + mo.invoke(object));
-                                getFrameObjectGetSetMethod(mf, map, getStrMethod(mf.getReturnType(), map, "set"), mo.invoke(object));
-                                //System.out.println("PASSOU");
+                                //getFrameObjectGetSetMethod(mf, map, getStrMethod(mf.getReturnType(), map, "set"), mo.invoke(object));
+                                //System.out.println("PASSOU");    
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -426,6 +480,59 @@ public abstract class ManipulaFrames extends JFrame {
                     });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void chamadaGetEncadeada(MapFrameField map, ManipulaBean object, Method mf) {
+        try {
+            if (map.referencedField().contains(".")) {
+                String[] campos = map.referencedField().split("\\.");
+                Object ob = null;
+                for (int c = 0; c < campos.length; c++) {
+                    //if (c != campos.length - 1) {
+                    Method m = null;
+                    if (c == 0) {
+                        m = getObjectGetSetMethod(object, campos[c], map.typeParameter(), "get");
+                        ob = m.invoke(object);
+                    } else {
+                        if (ob instanceof ManipulaBean) {
+                            m = getObjectGetSetMethod((ManipulaBean) ob, campos[c], map.typeParameter(), "get");
+                            if (!(m.invoke(ob) instanceof ManipulaBean)) {
+                                if (m.getReturnType() == List.class) {
+                                    ob = m.invoke(ob);
+                                    if (ob != null) {
+                                        List<?> lista = (List<?>) ob;
+                                        if (!lista.isEmpty()) {
+                                            ob = lista.get(0);
+                                        }
+                                    }
+                                } else if (c == campos.length - 1) {
+                                    getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "set"), m.invoke(ob), map.returnLocalDateTime());
+                                } else {
+                                    ob = m.invoke(ob);
+                                }
+                            } else {
+                                ob = m.invoke(ob);
+                            }
+                        } else if (ob.getClass().getSuperclass() == Enum.class) {
+                            m = getObjectGetSetMethod(ob, campos[c], map.typeParameter(), "get");
+                            getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "set"), m.invoke(ob), map.returnLocalDateTime());
+                        }
+                    }
+                }
+            } else if (mf.getReturnType() == JTable.class) {
+                Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "get");
+                if (mo.getReturnType() == List.class) {
+                    TableModelDefaultAdapter model = (TableModelDefaultAdapter) getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null, null);
+                    model.setLista((List) mo.invoke(object));
+                }
+            } else {
+                Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "get");
+                //System.out.println(mo.getName() + " = " + mo.invoke(object));
+                getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "set"), mo.invoke(object), map.returnLocalDateTime());
+                //System.out.println("PASSOU");    
+            }
+        } catch (Exception e) {
         }
     }
 
@@ -438,13 +545,13 @@ public abstract class ManipulaFrames extends JFrame {
      * @param prefix
      * @return
      */
-    private synchronized Method getObjectGetSetMethod(ManipulaBean object, MapFrameField map, String prefix) {
+    private synchronized Method getObjectGetSetMethod(Object object, String referencedField, Class typeParameter, String prefix) {
         try {
             if (prefix.equals("get") || prefix.equals("is")) {
-                prefix = map.typeParameter() != boolean.class && map.typeParameter() != Boolean.class ? "get" : "is";
-                return object.getClass().getDeclaredMethod(prefix.concat(map.referencedField().replaceFirst("\\w", map.referencedField().substring(0, 1).toUpperCase())));
+                prefix = typeParameter != boolean.class && typeParameter != Boolean.class ? "get" : "is";
+                return object.getClass().getDeclaredMethod(prefix.concat(referencedField.replaceFirst("\\w", referencedField.substring(0, 1).toUpperCase())));
             } else if (prefix.equals("set")) {
-                return object.getClass().getDeclaredMethod("set".concat(map.referencedField().replaceFirst("\\w", map.referencedField().substring(0, 1).toUpperCase())), map.typeParameter());
+                return object.getClass().getDeclaredMethod("set".concat(referencedField.replaceFirst("\\w", referencedField.substring(0, 1).toUpperCase())), typeParameter);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -462,13 +569,13 @@ public abstract class ManipulaFrames extends JFrame {
      * @param value
      * @return
      */
-    private synchronized Object getFrameObjectGetSetMethod(Method declaredMethod, MapFrameField map, String strMethod, Object value) {
+    private synchronized Object getFrameObjectGetSetMethod(Method declaredMethod, Class typeParameter, String strMethod, Object value, String returnType) {
         try {
             //System.out.println(strMethod);
             if (strMethod.contains("get") || strMethod.contains("is")) {
-                return CastFactory.cast(declaredMethod.invoke(this).getClass().getMethod(strMethod).invoke(declaredMethod.invoke(this)), map.typeParameter());
+                return CastFactory.cast(declaredMethod.invoke(this).getClass().getMethod(strMethod).invoke(declaredMethod.invoke(this)), typeParameter);
             } else if (strMethod.contains("set")) {
-                return declaredMethod.invoke(this).getClass().getMethod(strMethod, getTypeSet(declaredMethod.getReturnType())).invoke(declaredMethod.invoke(this), castTypeSet(formatAdapter(value), getTypeSet(declaredMethod.getReturnType())));
+                return declaredMethod.invoke(this).getClass().getMethod(strMethod, getTypeSet(declaredMethod.getReturnType())).invoke(declaredMethod.invoke(this), castTypeSet(formatAdapter(value, returnType), getTypeSet(declaredMethod.getReturnType())));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -477,10 +584,16 @@ public abstract class ManipulaFrames extends JFrame {
         return null;
     }
 
-    private Object formatAdapter(Object value) {
+    private Object formatAdapter(Object value, String returnType) {
         try {
             if (value.getClass() == LocalDate.class) {
                 value = Datas.getDateString((LocalDate) value);
+            } else if (value.getClass() == LocalDateTime.class) {
+                if (returnType.equals("data")) {
+                    value = Datas.getDateString(((LocalDateTime) value).toLocalDate());
+                } else if (returnType.equals("hora")) {
+                    value = Datas.getTimeString(((LocalDateTime) value).toLocalTime());
+                }
             }
             return value;
         } catch (Exception e) {
@@ -533,6 +646,8 @@ public abstract class ManipulaFrames extends JFrame {
             }
         } else if (returnType == JCheckBox.class) {
             return type ? "isSelected" : "setSelected";
+        } else if (returnType == JTable.class) {
+            return type ? "getModel" : "setModel";
         }
         return null;
     }

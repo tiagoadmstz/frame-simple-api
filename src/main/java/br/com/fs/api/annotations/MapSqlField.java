@@ -31,5 +31,6 @@ public @interface MapSqlField {
     public String condition() default "";
     public String between_partiner() default "";
     public boolean ignore() default false;
+    public String as_prefix() default "";
     
 }

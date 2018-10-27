@@ -7,6 +7,17 @@ package br.com.fs.api.interfaces;
 
 import br.com.fs.api.annotations.MapFrameField;
 import br.com.fs.api.beans.JTextFieldCBI;
+import br.com.fs.api.dal.EntityManagerHelper;
+import br.com.fs.api.frames.PesquisaDefaultForm;
+import br.com.fs.api.msg.MessageFactory;
+import br.com.fs.api.renderers.DefaultCBIHeaderRenderer;
+import br.com.fs.api.util.CastFactory;
+import br.com.fs.api.util.ControleInstancias;
+import br.com.fs.api.util.ControleUsuario;
+import br.com.fs.api.util.Datas;
+import br.com.fs.api.util.JasperUtil;
+import br.com.fs.api.util.OnChangeListener;
+import br.com.fs.api.util.ScrollPaneUtil;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,20 +47,12 @@ import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.MaskFormatter;
-import br.com.fs.api.dal.EntityManagerHelper;
-import br.com.fs.api.frames.PesquisaDefaultForm;
-import br.com.fs.api.msg.MessageFactory;
-import br.com.fs.api.renderers.DefaultCBIHeaderRenderer;
-import br.com.fs.api.util.CastFactory;
-import br.com.fs.api.util.ControleInstancias;
-import br.com.fs.api.util.ControleUsuario;
-import br.com.fs.api.util.Datas;
-import br.com.fs.api.util.OnChangeListener;
-import br.com.fs.api.util.ScrollPaneUtil;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -346,6 +349,7 @@ public abstract class AbstractListenerPattern<T> implements ActionListener, Focu
                 model.addLista((List<?>) getMethod.invoke(obj));
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -442,6 +446,14 @@ public abstract class AbstractListenerPattern<T> implements ActionListener, Focu
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(tamanho[i]);
         }
+    }
+
+    public InputStream getReport(String report_name) {
+        return getClass().getResourceAsStream(JasperUtil.SUBREPORT_DIR.concat(report_name));
+    }
+
+    public Map<String, Object> getDefaultReportMap() {
+        return JasperUtil.getDefaultMap(getClass().getResource(JasperUtil.SUBREPORT_DIR), getClass().getResource(JasperUtil.IMAGE_DIR));
     }
 
     @Override

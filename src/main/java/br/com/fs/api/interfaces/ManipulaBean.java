@@ -129,6 +129,10 @@ public abstract class ManipulaBean<T> implements Serializable {
                         if (((List) field.get(this)).isEmpty()) {
                             continue;
                         }
+                    } else if (field.getType() == String.class) {
+                        if (((String) field.get(this)).equals("")) {
+                            continue;
+                        }
                     }
                     return false;
                 }
@@ -237,7 +241,12 @@ public abstract class ManipulaBean<T> implements Serializable {
 
     private String mountWhere(String resultado, Field field, String prefix, MapSqlField map) {
         try {
-            String p = prefix == null ? getClass().getSimpleName().substring(0, 2).concat(".").toLowerCase() : prefix.concat(".");
+            String p = "";
+            if (map.as_prefix().equals("")) {
+                p = prefix == null ? getClass().getSimpleName().substring(0, 2).concat(".").toLowerCase() : prefix.concat(".");
+            } else {
+                p = map.as_prefix().concat(".");
+            }
             String param = "param";
 
             resultado = mountPrefixWhere(resultado, (map != null ? p.concat(map.mapeamento()) : p.concat(field.getName())), field.getType());

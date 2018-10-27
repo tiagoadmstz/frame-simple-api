@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public abstract class Datas {
 
-    public static final String DATE_BR = "dd/MM/yyyy", DATE_US = "yyyy-MM-dd", HORA_HM = "HH:mm";
+    public static final String DATE_BR = "dd/MM/yyyy", DATE_US = "yyyy-MM-dd", HORA_HM = "HH:mm", DATE_EX = "dd 'de' MMMM 'de' yyyy";
     private static final SimpleDateFormat DAY = new SimpleDateFormat("dd");
     private static final SimpleDateFormat MONTH = new SimpleDateFormat("MM");
     private static final SimpleDateFormat YEAR = new SimpleDateFormat("yyyy");
@@ -210,6 +210,19 @@ public abstract class Datas {
     public static String getDateString(LocalDate data) {
         try {
             return data.format(DateTimeFormatter.ofPattern(DATE_BR));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static String getDateExtend(String cidade, LocalDate data) {
+        try {
+            String temp = "";
+            if (cidade != null) {
+                temp = temp.concat(cidade.concat(", "));
+            }
+            temp = temp.concat(data.format(DateTimeFormatter.ofPattern(DATE_EX)));
+            return temp;
         } catch (Exception e) {
             return "";
         }

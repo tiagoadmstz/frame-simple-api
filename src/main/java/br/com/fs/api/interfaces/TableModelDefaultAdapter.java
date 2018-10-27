@@ -37,10 +37,10 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
         return columnNames[column];
     }
 
-    public List<String> getColumnsName(){
+    public List<String> getColumnsName() {
         return Arrays.asList(columnNames);
     }
-    
+
     public void setColmunName(String... columnNames) {
         this.columnNames = columnNames;
     }
@@ -94,6 +94,11 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    public void removeObjects(int... rowIndex) {
+        lista.removeAll(getObjects(rowIndex));
+        fireTableDataChanged();
+    }
+
     public void removeObject(T object) {
         lista.remove(object);
         fireTableDataChanged();
@@ -103,7 +108,7 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
         return rowIndex != -1 ? lista.get(rowIndex) : null;
     }
 
-    public List<T> getObjects(int[] rowIndex) {
+    public List<T> getObjects(int... rowIndex) {
         List<T> objects = new ArrayList();
         for (int i : rowIndex) {
             objects.add(lista.get(i));
@@ -118,7 +123,7 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
         });
         return objects;
     }
-    
+
     public void deletarObjects(int[] rowIndex) {
         List<T> temp = new ArrayList();
         for (int i : rowIndex) {
@@ -175,12 +180,12 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    public int getSelectedRow(){
+    public int getSelectedRow() {
         return selectedRow;
     }
-    
+
     public void setSelectedRow(int rowIndex) {
         this.selectedRow = rowIndex;
     }
-    
+
 }

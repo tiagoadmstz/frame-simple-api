@@ -13,5 +13,6 @@ public interface Usuario {
     
     public Permissoes getPermissoes();
     public String getNomeUsuario();
+    public String getSenha();
     
 }

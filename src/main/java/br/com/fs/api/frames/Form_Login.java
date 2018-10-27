@@ -39,10 +39,10 @@ public final class Form_Login extends ManipulaFrames {
      */
     private final Listener_Login listener;
 
-    public Form_Login() {
+    public Form_Login(EntityManagerHelper emh) {
         setImageIcon();
         initComponents();
-        listener = new Listener_Login(this);
+        listener = new Listener_Login(this, emh);
     }
 
     public void closeSplash() {
@@ -248,42 +248,6 @@ public final class Form_Login extends ManipulaFrames {
         }
     }//GEN-LAST:event_txtSenhaKeyPressed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Windows".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Form_Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Form_Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Form_Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Form_Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Form_Login().setVisible(true);
-            }
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel ButtonPanel;
     private javax.swing.JPanel MainPanel;
@@ -302,11 +266,12 @@ public final class Form_Login extends ManipulaFrames {
     public final class Listener_Login extends ListenerPatternAdapter<Form_Login> implements ActionListener, Serializable {
 
         private static final long serialVersionUID = -6735813835735026392L;
-        private final EntityManagerHelper emh = new EntityManagerHelper();
+        private final EntityManagerHelper emh;
 
-        public Listener_Login(Form_Login form) {
+        public Listener_Login(Form_Login form, EntityManagerHelper emh) {
             super(form);
             initComponents();
+            this.emh = emh;
         }
 
         @Override

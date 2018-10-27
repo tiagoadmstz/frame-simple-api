@@ -40,4 +40,6 @@ public @interface MapFrameField {
      * @return Classe dona do atributo
      */
     public Class targetEntity() default Object.class;
+    
+    public String returnLocalDateTime() default "data";
 }

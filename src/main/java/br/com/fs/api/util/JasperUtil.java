@@ -5,14 +5,16 @@
  */
 package br.com.fs.api.util;
 
-import br.com.fs.api.interfaces.ManipulaFrames;
 import br.com.fs.api.interfaces.ListenerPatternAdapter;
+import br.com.fs.api.interfaces.ManipulaFrames;
+import br.com.fs.api.interfaces.Report_Bean;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,6 +43,7 @@ import net.sf.jasperreports.view.JRViewer;
 public abstract class JasperUtil {
 
     public static final int TEXT = 0, NUMBER = 1, BOOLEAN = 2;
+    public static final String SUBREPORT_DIR = "/br/com/sres/reports/", IMAGE_DIR = "/br/com/sres/img/";
 
     public static void imprimirRelatorio(Connection conn, String titulo, Image image, Map parametros, InputStream inputStream) {
         try {
@@ -58,6 +61,14 @@ public abstract class JasperUtil {
             JRBeanCollectionDataSource ds = new JRBeanCollectionDataSource(listaResultados);
             JasperPrint jpPrint = JasperFillManager.fillReport(relatorio, parametros, ds);
             viewReportFrame(titulo, jpPrint, image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void imprimirRelatorio(InputStream relatorio, String titulo, Image image, Map parametros, Report_Bean report_bean) {
+        try {
+            imprimirRelatorio(relatorio, titulo, image, parametros, Arrays.asList(report_bean));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,6 +107,13 @@ public abstract class JasperUtil {
         return mapFilters;
     }
 
+    public static Map<String, Object> getDefaultMap(URL subreport_dir, URL image_dir) {
+        Map<String, Object> map = new HashMap();
+        map.put("SUBREPORT_DIR", subreport_dir);
+        map.put("IMAGE_DIR", image_dir);
+        return map;
+    }
+
     private static void viewReportFrame(String titulo, JasperPrint print, Image image) {
         JRViewer viewer = new JRViewer(print);
         ManipulaFrames frameReport = new ManipulaFrames() {
@@ -108,12 +126,11 @@ public abstract class JasperUtil {
         //saveContributor.stream().map(JRSaveContributor::getDescription).forEach(System.out::println);
         saveContributor.stream().filter(sc -> {
             return !sc.getDescription().equals("PDF (*.pdf)")
-            && !sc.getDescription().equals("CSV (*.csv)")
-            && !sc.getDescription().equals("XML (*.jrpxml, *.xml)")
-            && !sc.getDescription().equals("Single sheet XLS (*.xls)")
-            && !sc.getDescription().equals("ODT (*.odt)")
-            && !sc.getDescription().equals("DOCX (*.docx)")
-            ;
+                    && !sc.getDescription().equals("CSV (*.csv)")
+                    && !sc.getDescription().equals("XML (*.jrpxml, *.xml)")
+                    && !sc.getDescription().equals("Single sheet XLS (*.xls)")
+                    && !sc.getDescription().equals("ODT (*.odt)")
+                    && !sc.getDescription().equals("DOCX (*.docx)");
             //return !sc.getDescription().equals("PDF (*.pdf)");
         }).forEach(viewer::removeSaveContributor);
         viewer.registerKeyboardAction(new ListenerPatternAdapter(frameReport), "fechar", KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JRViewer.WHEN_IN_FOCUSED_WINDOW);
