@@ -52,7 +52,7 @@ public abstract class ManipulaFrames extends JFrame {
 
     private static final long serialVersionUID = 5932987037949674860L;
     public static int NOVO = 0, CANCELAR = 1, SALVAR = 3, EDITAR = 4, FECHAR = 1, IMPRIMIR = 5, DELETAR = 1, ALTERAR = 2;
-    private final Image image = new ImageIcon(getClass().getResource("/br/com/sres/img/iconeSermed.gif")).getImage();
+    private final Image image = new ImageIcon(getClass().getResource("/br/com/fs/api/img/icone.gif")).getImage();
     private int operacaoAtual = -1;
 
     public Optional<List<JPanel>> getListPaineis() {

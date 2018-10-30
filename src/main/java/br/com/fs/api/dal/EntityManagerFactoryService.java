@@ -13,9 +13,14 @@ import javax.persistence.EntityManagerFactory;
  * @author joaosavio
  *
  */
-public interface EntityManagerFactoryService {
-    
-    public EntityManagerFactory getEntityManagerFactory(String persistenceUnitName, Map<String, String> propMap);
-    public void closeFactories();
+public abstract class EntityManagerFactoryService {
+
+    public static EntityManagerFactory getEntityManagerFactory(String persistenceUnitName, Map<String, String> propMap) {
+        return null;
+    }
+
+    public static void closeFactories() {
+        
+    }
 
 }
