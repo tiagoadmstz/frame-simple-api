@@ -17,11 +17,13 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
+import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -37,12 +39,18 @@ public final class Form_Login extends ManipulaFrames {
     /**
      * Creates new form loginForm
      */
-    private final Listener_Login listener;
+    private Listener_Login listener;
 
-    public Form_Login(EntityManagerHelper emh) {
+    public Form_Login() {
         setImageIcon();
         initComponents();
-        listener = new Listener_Login(this, emh);
+        txtUsuario.requestFocus();
+    }
+
+    public void setEntityManagerHelper(EntityManagerHelper emh, ManipulaFrames main_frame, String title) {
+        this.setTitle(title);
+        listener = new Listener_Login(this, main_frame, emh);
+        txtUsuario.requestFocus();
     }
 
     public void closeSplash() {
@@ -52,12 +60,9 @@ public final class Form_Login extends ManipulaFrames {
         }
     }
 
-    public JButton getBtLogin() {
-        return btLogin;
-    }
-
-    public JButton getBtSenha() {
-        return btSenha;
+    @Override
+    public Optional<List<AbstractButton>> getListButtons() {
+        return Optional.of(Arrays.asList(btLogin, btSenha));
     }
 
     public JPasswordField getTxtSenha() {
@@ -78,7 +83,6 @@ public final class Form_Login extends ManipulaFrames {
     private void initComponents() {
 
         MainPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtUsuario = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -91,15 +95,10 @@ public final class Form_Login extends ManipulaFrames {
         menuBarCbiDefault = new br.com.fs.api.beans.MenuBarCbiDefault();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("SRES - Sistema de Registro Eletrônico em Saúde");
+        setTitle("Sistema");
         setResizable(false);
 
         MainPanel.setPreferredSize(new java.awt.Dimension(400, 200));
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Sistema de Registro Eletrônico em Saúde");
-        jLabel1.setToolTipText("");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -144,20 +143,17 @@ public final class Form_Login extends ManipulaFrames {
                 .addContainerGap()
                 .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtUsuario)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtSenha)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         MainPanelLayout.setVerticalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(26, 26, 26)
+                .addGap(14, 14, 14)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -168,8 +164,8 @@ public final class Form_Login extends ManipulaFrames {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btLogin.setText("Login");
@@ -178,7 +174,7 @@ public final class Form_Login extends ManipulaFrames {
 
         btSenha.setText("Cancelar");
         btSenha.setToolTipText("");
-        btSenha.setActionCommand("cancelar");
+        btSenha.setActionCommand("fechar");
         btSenha.setPreferredSize(new java.awt.Dimension(100, 23));
 
         javax.swing.GroupLayout ButtonPanelLayout = new javax.swing.GroupLayout(ButtonPanel);
@@ -216,10 +212,9 @@ public final class Form_Login extends ManipulaFrames {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(MainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(ButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(MainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -230,7 +225,7 @@ public final class Form_Login extends ManipulaFrames {
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
                 if (getTxtSenha().getPassword().length > 0) {
-                    getBtLogin().doClick();
+                    btLogin.doClick();
                 } else {
                     getTxtSenha().requestFocus();
                 }
@@ -241,7 +236,7 @@ public final class Form_Login extends ManipulaFrames {
         switch (evt.getKeyCode()) {
             case KeyEvent.VK_ENTER:
                 if (!Objects.equals(getTxtUsuario().getText(), null) && !Objects.equals(getTxtUsuario().getText(), "")) {
-                    getBtLogin().doClick();
+                    btLogin.doClick();
                 } else {
                     getTxtUsuario().requestFocus();
                 }
@@ -253,7 +248,6 @@ public final class Form_Login extends ManipulaFrames {
     private javax.swing.JPanel MainPanel;
     private javax.swing.JButton btLogin;
     private javax.swing.JButton btSenha;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -267,29 +261,29 @@ public final class Form_Login extends ManipulaFrames {
 
         private static final long serialVersionUID = -6735813835735026392L;
         private final EntityManagerHelper emh;
+        private final ManipulaFrames main_frame;
 
-        public Listener_Login(Form_Login form, EntityManagerHelper emh) {
+        public Listener_Login(Form_Login form, ManipulaFrames main_frame, EntityManagerHelper emh) {
             super(form);
             initComponents();
             this.emh = emh;
+            this.main_frame = main_frame;
         }
 
         @Override
         protected void initComponents() {
-            attachListener();
-        }
-
-        @Override
-        protected void attachListener() {
-            form.getBtLogin().addActionListener(this);
-            form.getBtSenha().addActionListener(this);
-            form.getItemFechar().addActionListener(this);
+            super.initComponents();
         }
 
         private void openMainForm(boolean abrir) {
             if (abrir) {
-                Form_Main formMain = (Form_Main) ControleInstancias.getInstance(Form_Main.class.getName());
-                formMain.setVisible(true);
+                if (this.main_frame != null) {
+                    ControleInstancias.setControleInstancias(main_frame.getName(), main_frame);
+                    main_frame.setVisible(true);
+                } else {
+                    Form_Main formMain = (Form_Main) ControleInstancias.getInstance(Form_Main.class.getName());
+                    formMain.setVisible(true);
+                }
             }
         }
 
@@ -304,9 +298,6 @@ public final class Form_Login extends ManipulaFrames {
                     } else {
                         JOptionPane.showMessageDialog(form, "Não foi possível iniciar a sessão, contate o administrador do sistema", "Erro de autenticação", JOptionPane.ERROR_MESSAGE);
                     }
-                    break;
-                case "cancelar":
-                    form.fecharSistema();
                     break;
                 case "fechar":
                     form.fecharSistema();

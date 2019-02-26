@@ -11,6 +11,7 @@ import br.com.fs.api.dal.EntityManagerHelper;
 import br.com.fs.api.frames.PesquisaDefaultForm;
 import br.com.fs.api.msg.MessageFactory;
 import br.com.fs.api.renderers.DefaultCBIHeaderRenderer;
+import br.com.fs.api.table.components.TableComboBox;
 import br.com.fs.api.util.CastFactory;
 import br.com.fs.api.util.ControleInstancias;
 import br.com.fs.api.util.ControleUsuario;
@@ -511,6 +512,18 @@ public abstract class AbstractListenerPattern<T> implements ActionListener, Focu
              }
              }*/
         }
+    }
+
+    public JComboBox getComboBoxColumn(JTable table, int column) {
+        TableComboBox tcb = (TableComboBox) table.getColumnModel().getColumn(column).getCellRenderer();
+        return tcb.getCombobox();
+    }
+
+    public void setComboBoxColumn(JTable table, int column, Object... objects) {
+        TableComboBox tcb = new TableComboBox();
+        Arrays.asList(objects).forEach(item -> tcb.getCombobox().addItem(item));
+        tcb.getCombobox().setSelectedIndex(-1);
+        table.getColumnModel().getColumn(column).setCellRenderer(tcb);
     }
 
     /*private PersistenceObject_D_Remote getEmh(String persistenceName) {

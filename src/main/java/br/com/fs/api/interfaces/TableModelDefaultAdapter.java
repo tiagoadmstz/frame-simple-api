@@ -187,5 +187,5 @@ public abstract class TableModelDefaultAdapter<T> extends AbstractTableModel {
     public void setSelectedRow(int rowIndex) {
         this.selectedRow = rowIndex;
     }
-
+    
 }

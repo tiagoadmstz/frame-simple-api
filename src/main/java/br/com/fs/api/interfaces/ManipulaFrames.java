@@ -10,6 +10,7 @@ import br.com.fs.api.beans.JTextFieldCBI;
 import br.com.fs.api.beans.MenuBarCbiDefault;
 import br.com.fs.api.msg.MessageFactory;
 import br.com.fs.api.util.CastFactory;
+import br.com.fs.api.util.ConfigUtil;
 import br.com.fs.api.util.Datas;
 import java.awt.Component;
 import java.awt.Image;
@@ -52,7 +53,7 @@ public abstract class ManipulaFrames extends JFrame {
 
     private static final long serialVersionUID = 5932987037949674860L;
     public static int NOVO = 0, CANCELAR = 1, SALVAR = 3, EDITAR = 4, FECHAR = 1, IMPRIMIR = 5, DELETAR = 1, ALTERAR = 2;
-    private final Image image = new ImageIcon(getClass().getResource("/br/com/fs/api/img/icone.gif")).getImage();
+    private final Image image = ConfigUtil.getImageIconFile();
     private int operacaoAtual = -1;
 
     public Optional<List<JPanel>> getListPaineis() {
@@ -437,6 +438,14 @@ public abstract class ManipulaFrames extends JFrame {
                 try {
                     m.invoke(ob, getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null, null));
                 } catch (Exception e) {
+                }
+            } else if (mf.getReturnType() == JTable.class) {
+                Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "set");
+                TableModelDefaultAdapter model = (TableModelDefaultAdapter) getFrameObjectGetSetMethod(mf, map.typeParameter(), getStrMethod(mf.getReturnType(), map, "get"), null, null);
+                if (!model.getLista().isEmpty()) {
+                    if (!((ManipulaBean) model.getLista().get(0)).isNull()) {
+                        mo.invoke(object, model.clonar());
+                    }
                 }
             } else {
                 Method mo = getObjectGetSetMethod(object, map.referencedField(), map.typeParameter(), "set");

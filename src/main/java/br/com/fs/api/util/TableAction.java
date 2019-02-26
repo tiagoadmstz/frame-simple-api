@@ -70,6 +70,7 @@ public final class TableAction implements Serializable {
     private void deleteLine() {
         if (MessageFactory.getQuestionMessage("Realmente deseja excluir o registro?", table)) {
             model.removeObject(table.getSelectedRow());
+            this.addLine();
         }
     }
 
@@ -91,7 +92,10 @@ public final class TableAction implements Serializable {
 
     private boolean verificaLinhaAbaixo() {
         if (model.getRowCount() > 1) {
-            return ((ManipulaBean) model.getObject(model.getRowCount() - 1)).isNull();
+            ManipulaBean mb = (ManipulaBean) model.getObject(model.getRowCount() - 1);
+            if (!mb.isNull()) {
+                return ((ManipulaBean) model.getObject(model.getRowCount() - 1)).isNull();
+            }
         }
         return false;
     }

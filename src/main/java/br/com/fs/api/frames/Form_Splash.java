@@ -5,12 +5,15 @@
  */
 package br.com.fs.api.frames;
 
+import br.com.fs.api.dal.EntityManagerHelper;
 import br.com.fs.api.util.ControleInstancias;
 import br.com.fs.api.interfaces.ManipulaFrames;
+import br.com.fs.api.util.ConfigUtil;
 import br.com.fs.api.util.Utilidades;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -19,7 +22,7 @@ import javax.swing.Timer;
  *
  * @author Tiago D. Teixeira
  */
-public final class Form_Splash extends ManipulaFrames{
+public final class Form_Splash extends ManipulaFrames {
 
     private static final long serialVersionUID = -1008960028915377183L;
 
@@ -28,12 +31,13 @@ public final class Form_Splash extends ManipulaFrames{
     /**
      * Creates new form SplashForm
      */
-    public Form_Splash() {
+    public Form_Splash(EntityManagerHelper emh, ManipulaFrames main_frame, String title) {
         Utilidades.mudaLookAndFeel(Utilidades.WINDOWS);
         setImageIcon();
         initComponents();
         this.fecharESC(menuBarCbiDefault.getItemFechar());
-        carregarSistema();
+        jLabel1.setIcon(new ImageIcon(ConfigUtil.getImageSplashFile()));
+        carregarSistema(emh, main_frame, title);
     }
 
     private void fecharESC(JMenuItem menuItem) {
@@ -41,7 +45,7 @@ public final class Form_Splash extends ManipulaFrames{
         menuItem.setAccelerator(escape);
     }
 
-    public void carregarSistema() {
+    public void carregarSistema(EntityManagerHelper emh, ManipulaFrames main_frame, String title) {
 
         ControleInstancias.setControleInstancias(Form_Splash.class.getName(), this);
 
@@ -49,6 +53,7 @@ public final class Form_Splash extends ManipulaFrames{
             @Override
             public void run() {
                 Form_Login loginForm = (Form_Login) ControleInstancias.getInstance(Form_Login.class.getName());
+                loginForm.setEntityManagerHelper(emh, main_frame, title);
                 loginForm.closeSplash();
                 loginForm.setVisible(true);
             }
@@ -87,7 +92,7 @@ public final class Form_Splash extends ManipulaFrames{
         });
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/sres/img/splash.gif"))); // NOI18N
+        jLabel1.setPreferredSize(new java.awt.Dimension(424, 182));
 
         jLabel3.setText("Sistema - versão 1.0");
 
@@ -112,7 +117,7 @@ public final class Form_Splash extends ManipulaFrames{
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -127,44 +132,6 @@ public final class Form_Splash extends ManipulaFrames{
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         t.stop();
     }//GEN-LAST:event_formWindowClosed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Form_Splash.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Form_Splash.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Form_Splash.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Form_Splash.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Form_Splash().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
